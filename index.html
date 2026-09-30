@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atlas Histórico y Geográfico de Europa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Special+Elite&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #d8c7a8;
+            background-image: radial-gradient(circle, #e6d8bc 0%, #c2ad89 100%);
+            font-family: 'EB Garamond', serif;
+            color: #2c221e;
+        }
+        .font-cinzel { font-family: 'Cinzel', serif; }
+        .font-elite { font-family: 'Special Elite', cursive; }
+        .vintage-frame {
+            border: 6px double #4a3525;
+            box-shadow: 0 10px 25px rgba(44, 34, 30, 0.3), inset 0 0 40px rgba(139, 115, 85, 0.3);
+            background-color: #f4ebd0;
+        }
+        .vintage-card {
+            background-color: #f7eedc;
+            border: 3px solid #5c4033;
+            box-shadow: 4px 4px 0px #5c4033;
+            transition: all 0.2s ease-in-out;
+        }
+        .vintage-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 7px 7px 0px #3b281a;
+            background-color: #faf5e6;
+        }
+        .vintage-btn {
+            background-color: #5c4033;
+            color: #f4ebd0;
+            border: 2px solid #3b281a;
+            font-family: 'Cinzel', serif;
+            transition: all 0.2s;
+        }
+        .vintage-btn:hover {
+            background-color: #3b281a;
+            color: #fff;
+        }
+        .parchment-modal {
+            background-color: #f7eedc;
+            background-image: linear-gradient(to bottom, #f9f4e6, #f2e6cb);
+            border: 5px double #4a3525;
+        }
+        .drag-item {
+            cursor: grab;
+            user-select: none;
+            touch-action: none;
+        }
+        .drag-item:active { cursor: grabbing; }
+        .map-pin {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            background-color: #d32f2f;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 6px rgba(0,0,0,0.6);
+            transform: translate(-50%, -50%);
+            animation: pulse-pin 1.5s infinite;
+        }
+        @keyframes pulse-pin {
+            0% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.7); }
+            70% { transform: translate(-50%, -50%) scale(1.2); box-shadow: 0 0 0 8px rgba(211, 47, 47, 0); }
+            100% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 0 0 rgba(211, 47, 47, 0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-between p-4 md:p-8">
+
+    <header class="w-full max-w-6xl text-center mb-8 vintage-frame p-6 rounded-lg">
+        <h1 class="font-cinzel text-3xl md:text-5xl font-bold text-[#3b281a] tracking-wider mb-2">
+            Atlas de Europa: Exploración e Historia
+        </h1>
+        <p class="font-elite text-sm md:text-base text-[#5c4033]">
+            Recursos interactivos y pedagógicos del viejo continente
+        </p>
+    </header>
+
+    <main class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div onclick="openModal(1)" class="vintage-card p-6 rounded-md cursor-pointer flex flex-col justify-between min-h-[180px]">
+            <div>
+                <span class="inline-block font-elite text-xs bg-[#d8c7a8] text-[#3b281a] px-2 py-1 rounded mb-2 border border-[#8b7355]">Sección I</span>
+                <h2 class="font-cinzel text-2xl font-bold text-[#3b281a] mb-1">Descubrimos Europa</h2>
+                <p class="font-elite text-sm text-[#6b4f3b]">Conocemos el medio físico del viejo continente</p>
+            </div>
+            <div class="mt-4 flex justify-end">
+                <span class="font-cinzel text-xs font-bold text-[#5c4033] underline">Abrir Mapa Físico &rarr;</span>
+            </div>
+        </div>
+
+        <div onclick="openModal(2)" class="vintage-card p-6 rounded-md cursor-pointer flex flex-col justify-between min-h-[180px]">
+            <div>
+                <span class="inline-block font-elite text-xs bg-[#d8c7a8] text-[#3b281a] px-2 py-1 rounded mb-2 border border-[#8b7355]">Sección II</span>
+                <h2 class="font-cinzel text-2xl font-bold text-[#3b281a] mb-1">De Europa muchos paisajes</h2>
+                <p class="font-elite text-sm text-[#6b4f3b]">Regiones geográficas y diversidad climática</p>
+            </div>
+            <div class="mt-4 flex justify-end">
+                <span class="font-cinzel text-xs font-bold text-[#5c4033] underline">Ver Pasaporte Regional &rarr;</span>
+            </div>
+        </div>
+
+        <div onclick="openModal(3)" class="vintage-card p-6 rounded-md cursor-pointer flex flex-col justify-between min-h-[180px]">
+            <div>
+                <span class="inline-block font-elite text-xs bg-[#d8c7a8] text-[#3b281a] px-2 py-1 rounded mb-2 border border-[#8b7355]">Sección III</span>
+                <h2 class="font-cinzel text-2xl font-bold text-[#3b281a] mb-1">Europa, piensa en verde</h2>
+                <p class="font-elite text-sm text-[#6b4f3b]">Importancia del desarrollo sostenible para el desarrollo económico</p>
+            </div>
+            <div class="mt-4 flex justify-end">
+                <span class="font-cinzel text-xs font-bold text-[#5c4033] underline">Jugar: Europa tiene un problema &rarr;</span>
+            </div>
+        </div>
+
+        <div onclick="openModal(4)" class="vintage-card p-6 rounded-md cursor-pointer flex flex-col justify-between min-h-[180px]">
+            <div>
+                <span class="inline-block font-elite text-xs bg-[#d8c7a8] text-[#3b281a] px-2 py-1 rounded mb-2 border border-[#8b7355]">Sección IV</span>
+                <h2 class="font-cinzel text-2xl font-bold text-[#3b281a] mb-1">Yo decido</h2>
+                <p class="font-elite text-sm text-[#6b4f3b]">Ciudadanía económica y enfoque de derechos</p>
+            </div>
+            <div class="mt-4 flex justify-end">
+                <span class="font-cinzel text-xs font-bold text-[#5c4033] underline">Iniciar Simulador de Presupuesto &rarr;</span>
+            </div>
+        </div>
+    </main>
+
+    <div id="modalOverlay" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-3 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div id="modalContainer" class="parchment-modal w-full max-w-6xl max-h-[95vh] rounded-lg shadow-2xl flex flex-col overflow-hidden transform scale-95 transition-transform duration-300">
+            <div class="flex justify-between items-center p-4 border-b-2 border-[#5c4033] bg-[#e6d8bc]">
+                <h3 id="modalTitle" class="font-cinzel text-xl md:text-2xl font-bold text-[#3b281a]">Título</h3>
+                <button onclick="closeModal()" class="vintage-btn px-3 py-1 text-sm font-bold rounded">X Cerrar</button>
+            </div>
+            <div id="modalBody" class="p-4 md:p-6 overflow-y-auto flex-1 font-elite"></div>
+        </div>
+    </div>
+
+    <footer class="w-full text-center text-xs font-elite text-[#4a3525] mt-4">
+        Herramienta Educativa Geográfica &bull; Tarea Escolar de Europa
+    </footer>
+
+    <script>
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalContainer = document.getElementById('modalContainer');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+
+        function openModal(sectionId) {
+            modalOverlay.classList.remove('opacity-0', 'pointer-events-none');
+            modalContainer.classList.remove('scale-95');
+            if (sectionId === 1) loadSection1();
+            else if (sectionId === 2) loadSection2();
+            else if (sectionId === 3) loadSection3();
+            else if (sectionId === 4) loadSection4();
+        }
+
+        function closeModal() {
+            modalOverlay.classList.add('opacity-0', 'pointer-events-none');
+            modalContainer.classList.add('scale-95');
+        }
+
+        // ==========================================
+        // SECCIÓN 1: MAPA FÍSICO Y FICHAS
+        // ==========================================
+        function loadSection1() {
+            modalTitle.innerText = "Descubrimos Europa: Medio Físico (Semana 1)";
+            modalBody.innerHTML = `
+                <div class="space-y-4">
+                    <div class="flex flex-col md:flex-row justify-between items-center bg-[#e6d8bc] p-3 rounded border border-[#5c4033] gap-2">
+                        <span class="text-xs text-[#3b281a]">💡 <strong>¿No carga tu mapa?</strong> Súbelo tú mismo desde tu PC aquí:</span>
+                        <input type="file" id="uploadMapInput" accept="image/*" class="text-xs text-[#3b281a] file:mr-2 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-[#5c4033] file:text-[#f4ebd0] hover:file:bg-[#3b281a] cursor-pointer" onchange="previewCustomMap(event)">
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                        <div class="lg:col-span-2 bg-[#ecdcb8] border-2 border-[#5c4033] p-3 rounded relative flex flex-col justify-between">
+                            <div class="flex justify-between items-center border-b border-[#5c4033] pb-1 mb-2">
+                                <h4 class="font-cinzel font-bold text-xs text-[#3b281a]">Mapa Europeo Interactivo</h4>
+                                <span id="map-info-tag" class="text-[10px] bg-[#5c4033] text-[#f4ebd0] px-2 py-0.5 rounded">Haz clic en los pines 📍</span>
+                            </div>
+                            
+                            <div id="map-wrapper" class="relative w-full rounded border border-[#7a5c44] overflow-hidden mb-3 bg-[#fff] flex justify-center shadow-inner min-h-[280px]">
+                                <img id="main-european-map" src="Mapa europeo.png" alt="Mapa de Europa" class="w-full max-h-[340px] object-contain" onerror="this.src='https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?q=80&w=800&auto=format&fit=crop'">
+                                
+                                <div class="map-pin" style="top: 25%; left: 30%;" onclick="showPinInfo('Océano Atlántico e Islas del Norte', 'Zona marítima clave que baña las costas occidentales de Europa.')" title="Océano Atlántico"></div>
+                                <div class="map-pin" style="top: 75%; left: 32%;" onclick="showPinInfo('Península Ibérica y Mar Mediterráneo', 'Región montañosa y cálida al sur del continente.')" title="Península Ibérica"></div>
+                                <div class="map-pin" style="top: 55%; left: 50%;" onclick="showPinInfo('Los Alpes y Grandes Cadenas', 'Sistema montañoso central que divide el sur del norte.')" title="Los Alpes"></div>
+                                <div class="map-pin" style="top: 45%; left: 70%;" onclick="showPinInfo('Río Danubio y Llanura Oriental', 'Vastedades fluviales y planicies del este europeo.')" title="Río Danubio"></div>
+                            </div>
+
+                            <div id="pin-description-box" class="bg-[#f7eedc] border border-[#5c4033] p-2 rounded text-xs text-[#3b281a] mb-2 italic">
+                                📍 Haz clic en cualquier punto rojo del mapa para ver los detalles geográficos destacados.
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2">
+                                <div id="drop-zona-norte" ondragover="allowDrop(event)" ondrop="dropItem(event, 'Norte')" class="bg-[#e2d2b0] border border-[#7a5c44] p-2 rounded text-center min-h-[55px] flex flex-col items-center justify-center">
+                                    <span class="text-[10px] font-bold text-[#5c4033]">ZONA NORTE / OCÉANOS</span>
+                                    <span class="target-slot text-[9px] text-gray-600 italic">Arrastra aquí</span>
+                                </div>
+                                <div id="drop-zona-sur" ondragover="allowDrop(event)" ondrop="dropItem(event, 'Sur')" class="bg-[#e2d2b0] border border-[#7a5c44] p-2 rounded text-center min-h-[55px] flex flex-col items-center justify-center">
+                                    <span class="text-[10px] font-bold text-[#5c4033]">ZONA SUR / PENÍNSULAS</span>
+                                    <span class="target-slot text-[9px] text-gray-600 italic">Arrastra aquí</span>
+                                </div>
+                                <div id="drop-zona-este" ondragover="allowDrop(event)" ondrop="dropItem(event, 'Este')" class="bg-[#e2d2b0] border border-[#7a5c44] p-2 rounded text-center min-h-[55px] flex flex-col items-center justify-center">
+                                    <span class="text-[10px] font-bold text-[#5c4033]">MONTAÑAS Y RÍOS</span>
+                                    <span class="target-slot text-[9px] text-gray-600 italic">Arrastra aquí</span>
+                                </div>
+                                <div id="drop-zona-paises" ondragover="allowDrop(event)" ondrop="dropItem(event, 'Paises')" class="bg-[#e2d2b0] border border-[#7a5c44] p-2 rounded text-center min-h-[55px] flex flex-col items-center justify-center">
+                                    <span class="text-[10px] font-bold text-[#5c4033]">PAÍSES CLAVE</span>
+                                    <span class="target-slot text-[9px] text-gray-600 italic">Arrastra aquí</span>
+                                </div>
+                            </div>
+                            
+                            <div id="map-score" class="text-xs font-bold text-[#3b281a] text-right mt-2">Elementos colocados: 0 / 6</div>
+                        </div>
+
+                        <div class="bg-[#e6d8bc] border-2 border-[#5c4033] p-3 rounded flex flex-col gap-2">
+                            <h4 class="font-cinzel font-bold text-xs text-[#3b281a] border-b border-[#5c4033] pb-1">Fichas Geográficas</h4>
+                            <div id="drag-items-container" class="flex flex-col gap-2 overflow-y-auto max-h-[350px]">
+                                <div draggable="true" ondragstart="drag(event)" id="item-1" data-zone="Norte" class="drag-item bg-[#f7eedc] border border-[#5c4033] p-2 rounded text-xs text-center shadow-sm">
+                                    🌊 Océano Atlántico & Islas
+                                </div>
+                                <div draggable="true" ondragstart="drag(event)" id="item-2" data-zone="Sur" class="drag-item bg-[#f7eedc] border border-[#5c4033] p-2 rounded text-xs text-center shadow-sm">
+                                    🏖️️ Península Ibérica & Med.
+                                </div>
+                                <div draggable="true" ondragstart="drag(event)" id="item-3" data-zone="Este" class="drag-item bg-[#f7eedc] border border-[#5c4033] p-2 rounded text-xs text-center shadow-sm">
+                                    ⛰️ Los Alpes (Montañas)
+                                </div>
+                                <div draggable="true" ondragstart="drag(event)" id="item-4" data-zone="Este" class="drag-item bg-[#f7eedc] border border-[#5c4033] p-2 rounded text-xs text-center shadow-sm">
+                                    💧 Río Danubio & Llanuras
+                                </div>
+                                <div draggable="true" ondragstart="drag(event)" id="item-5" data-zone="Paises" class="drag-item bg-[#f7eedc] border border-[#5c4033] p-2 rounded text-xs text-center shadow-sm">
+                                    🏛️ Francia (País Clave)
+                                </div>
+                                <div draggable="true" ondragstart="drag(event)" id="item-6" data-zone="Paises" class="drag-item bg-[#f7eedc] border border-[#5c4033] p-2 rounded text-xs text-center shadow-sm">
+                                    ⚙️ Alemania (País Clave)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            placedCount = 0;
+        }
+
+        function previewCustomMap(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('main-european-map').src = e.target.result;
+                    document.getElementById('map-info-tag').innerText = "¡Mapa personalizado cargado!";
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function showPinInfo(title, desc) {
+            document.getElementById('pin-description-box').innerHTML = `<strong>📍 ${title}:</strong> ${desc}`;
+        }
+
+        let placedCount = 0;
+        function allowDrop(ev) { ev.preventDefault(); }
+        function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+
+        function dropItem(ev, zoneName) {
+            ev.preventDefault();
+            const dataId = ev.dataTransfer.getData("text");
+            const draggedElement = document.getElementById(dataId);
+            const targetZone = draggedElement.getAttribute("data-zone");
+
+            if (targetZone === zoneName) {
+                ev.currentTarget.appendChild(draggedElement);
+                draggedElement.setAttribute("draggable", "false");
+                draggedElement.classList.remove("bg-[#f7eedc]");
+                draggedElement.classList.add("bg-[#c8e6c9]", "border-green-800", "my-1");
+                placedCount++;
+                document.getElementById('map-score').innerText = `Elementos colocados: ${placedCount} / 6`;
+                if (placedCount === 6) {
+                    setTimeout(() => alert("¡Excelente trabajo, bro! Completaste el mapa físico."), 200);
+                }
+            } else {
+                alert("Esta ficha no corresponde a esta zona. ¡Inténtalo de nuevo!");
+            }
+        }
+
+        // ==========================================
+        // SECCIÓN 2: PASAPORTE REGIONAL
+        // ==========================================
+        function loadSection2() {
+            modalTitle.innerText = "De Europa muchos paisajes: Pasaporte Regional";
+            modalBody.innerHTML = `
+                <div class="space-y-4">
+                    <p class="text-sm text-[#4a3525]">Selecciona una región europea para visualizar su pasaporte geográfico:</p>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="changePassport('meridional')" class="vintage-btn px-3 py-1 text-xs rounded">Europa Meridional</button>
+                        <button onclick="changePassport('septentrional')" class="vintage-btn px-3 py-1 text-xs rounded">Europa Septentrional</button>
+                        <button onclick="changePassport('central')" class="vintage-btn px-3 py-1 text-xs rounded">Europa Central</button>
+                        <button onclick="changePassport('oriental')" class="vintage-btn px-3 py-1 text-xs rounded">Europa Oriental</button>
+                    </div>
+                    <div class="bg-[#fcf8ec] border-4 double border-[#5c4033] p-6 rounded-lg shadow-inner max-w-xl mx-auto flex flex-col md:flex-row gap-6 items-center">
+                        <div class="w-32 h-32 bg-[#e6d8bc] border-2 border-[#5c4033] rounded-full flex flex-col items-center justify-center text-center p-2 shadow">
+                            <span class="text-3xl mb-1" id="pass-icon">🇪🇸</span>
+                            <span class="font-cinzel text-xs font-bold text-[#3b281a]" id="pass-region-short">MERIDIONAL</span>
+                        </div>
+                        <div class="flex-1 space-y-2 text-sm">
+                            <h4 class="font-cinzel text-xl font-bold text-[#3b281a] border-b border-[#5c4033] pb-1" id="pass-title">Pasaporte: España</h4>
+                            <p><strong>Región Geográfica:</strong> <span id="pass-reg">Europa del Sur (Meridional)</span></p>
+                            <p><strong>Clima Predominante:</strong> <span id="pass-climate">Mediterráneo</span></p>
+                            <p><strong>Paisaje Principal:</strong> <span id="pass-landscape">Costas escarpadas y valles</span></p>
+                            <p><strong>Actividad Económica:</strong> <span id="pass-activity">Turismo y agricultura mediterránea</span></p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        const passports = {
+            meridional: { title: "Pasaporte: España", region: "Europa del Sur", climate: "Mediterráneo", landscape: "Costas y cordilleras", activity: "Turismo y agricultura", icon: "🇪🇸", short: "MERIDIONAL" },
+            septentrional: { title: "Pasaporte: Noruega", region: "Europa del Norte", climate: "Polar / Subártico", landscape: "Fiordos y bosques", activity: "Pesca e hidroeléctrica", icon: "🇳🇴", short: "SEPTENTRIONAL" },
+            central: { title: "Pasaporte: Alemania", region: "Europa Central", climate: "Templado continental", landscape: "Llanura central y Alpes", activity: "Industria y tecnología", icon: "🇩🇪", short: "CENTRAL" },
+            oriental: { title: "Pasaporte: Polonia", region: "Europa Oriental", climate: "Continental húmedo", landscape: "Llanuras y lagos", activity: "Agricultura y manufactura", icon: "🇵🇱", short: "ORIENTAL" }
+        };
+
+        function changePassport(key) {
+            const p = passports[key];
+            document.getElementById('pass-title').innerText = p.title;
+            document.getElementById('pass-reg').innerText = p.region;
+            document.getElementById('pass-climate').innerText = p.climate;
+            document.getElementById('pass-landscape').innerText = p.landscape;
+            document.getElementById('pass-activity').innerText = p.activity;
+            document.getElementById('pass-icon').innerText = p.icon;
+            document.getElementById('pass-region-short').innerText = p.short;
+        }
+
+        // ==========================================
+        // SECCIÓN 3: EUROPA, PIENSA EN VERDE
+        // ==========================================
+        function loadSection3() {
+            modalTitle.innerText = "Europa, piensa en verde: Desarrollo Sostenible";
+            modalBody.innerHTML = `
+                <div class="space-y-4">
+                    <p class="text-sm text-[#4a3525]">Juego: <strong>"Europa tiene un problema"</strong>.</p>
+                    <div class="bg-[#f7eedc] border-2 border-[#5c4033] p-5 rounded shadow">
+                        <h4 class="font-cinzel text-lg font-bold text-[#3b281a] mb-2" id="case-title">Caso 1: La Fábrica y el Río</h4>
+                        <p class="text-sm mb-4" id="case-desc">Una gran fábrica genera empleos, pero sus residuos contaminan un río cercano.</p>
+                        <div class="space-y-2">
+                            <button onclick="resolveCase('a')" class="w-full text-left text-xs bg-[#e6d8bc] hover:bg-[#d8c7a8] border border-[#5c4033] p-3 rounded"><strong>Opción A:</strong> Seguir operando sin cambios para proteger empleos.</button>
+                            <button onclick="resolveCase('b')" class="w-full text-left text-xs bg-[#e6d8bc] hover:bg-[#d8c7a8] border border-[#5c4033] p-3 rounded"><strong>Opción B (Sostenible):</strong> Instalar filtros ecológicos modernos.</button>
+                        </div>
+                        <div id="case-feedback" class="mt-4 p-3 text-xs rounded hidden"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function resolveCase(option) {
+            const feedback = document.getElementById('case-feedback');
+            feedback.classList.remove('hidden');
+            if (option === 'a') {
+                feedback.className = "mt-4 p-3 text-xs rounded bg-[#ffccbc] border border-[#d32f2f] text-[#b71c1c]";
+                feedback.innerHTML = "<strong>No sostenible:</strong> Se protegió el empleo temporalmente, pero el río colapsó.";
+            } else {
+                feedback.className = "mt-4 p-3 text-xs rounded bg-[#c8e6c9] border border-[#388e3c] text-[#1b5e20]";
+                feedback.innerHTML = "<strong>¡Excelente!</strong> Decisión sostenible exitosa: empleo protegido y río salvado.";
+            }
+        }
+
+        // ==========================================
+        // SECCIÓN 4: YO DECIDO (SIMULADOR DE MONEDAS)
+        // ==========================================
+        let presupuesto = 100000;
+        let proyectosElegidos = [];
+
+        function loadSection4() {
+            presupuesto = 100000;
+            proyectosElegidos = [];
+            renderBudgetGame();
+        }
+
+        function renderBudgetGame() {
+            modalTitle.innerText = "Yo Decido: Simulador de Presupuesto";
+            modalBody.innerHTML = `
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center bg-[#e6d8bc] p-3 rounded border border-[#5c4033]">
+                        <span class="font-cinzel font-bold text-sm text-[#3b281a]">Presupuesto Disponible:</span>
+                        <span class="font-bold text-lg text-[#2e7d32]" id="budget-amount">100,000 Monedas</span>
+                    </div>
+                    <p class="text-xs text-[#4a3525]">Tienes un presupuesto limitado para mejorar tu comunidad aplicando ciudadanía económica y enfoque de derechos. Selecciona qué proyectos financiar:</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div class="bg-[#f7eedc] border border-[#5c4033] p-3 rounded flex flex-col justify-between">
+                            <div>
+                                <h5 class="font-cinzel font-bold text-xs text-[#3b281a]">🏫 Mejorar la Escuela</h5>
+                                <p class="text-[11px] text-[#6b4f3b] mt-1">Garantiza el derecho a la educación de calidad para los jóvenes.</p>
+                                <span class="text-xs font-bold text-[#8b0000] block mt-2">Costo: 30,000 Monedas</span>
+                            </div>
+                            <button onclick="investProject(this, 'Mejorar Escuela', 30000)" class="mt-3 vintage-btn px-3 py-1.5 text-xs rounded">Financiar</button>
+                        </div>
+
+                        <div class="bg-[#f7eedc] border border-[#5c4033] p-3 rounded flex flex-col justify-between">
+                            <div>
+                                <h5 class="font-cinzel font-bold text-xs text-[#3b281a]">🌳 Crear Áreas Verdes</h5>
+                                <p class="text-[11px] text-[#6b4f3b] mt-1">Derecho a un medio ambiente sano y bienestar comunitario.</p>
+                                <span class="text-xs font-bold text-[#8b0000] block mt-2">Costo: 20,000 Monedas</span>
+                            </div>
+                            <button onclick="investProject(this, 'Áreas Verdes', 20000)" class="mt-3 vintage-btn px-3 py-1.5 text-xs rounded">Financiar</button>
+                        </div>
+
+                        <div class="bg-[#f7eedc] border border-[#5c4033] p-3 rounded flex flex-col justify-between">
+                            <div>
+                                <h5 class="font-cinzel font-bold text-xs text-[#3b281a]">🏭 Construir Fábrica</h5>
+                                <p class="text-[11px] text-[#6b4f3b] mt-1">Impulsa el empleo local y la economía regional rápida.</p>
+                                <span class="text-xs font-bold text-[#8b0000] block mt-2">Costo: 40,000 Monedas</span>
+                            </div>
+                            <button onclick="investProject(this, 'Construir Fábrica', 40000)" class="mt-3 vintage-btn px-3 py-1.5 text-xs rounded">Financiar</button>
+                        </div>
+
+                        <div class="bg-[#f7eedc] border border-[#5c4033] p-3 rounded flex flex-col justify-between">
+                            <div>
+                                <h5 class="font-cinzel font-bold text-xs text-[#3b281a]">💧 Mejorar Agua Potable</h5>
+                                <p class="text-[11px] text-[#6b4f3b] mt-1">Derecho humano básico y salud pública fundamental.</p>
+                                <span class="text-xs font-bold text-[#8b0000] block mt-2">Costo: 35,000 Monedas</span>
+                            </div>
+                            <button onclick="investProject(this, 'Agua Potable', 35000)" class="mt-3 vintage-btn px-3 py-1.5 text-xs rounded">Financiar</button>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-[#5c4033] pt-3 flex flex-col md:flex-row justify-between items-center gap-2">
+                        <span class="text-xs font-bold text-[#3b281a]">Proyectos financiados: <span id="funded-list" class="font-normal italic">Ninguno</span></span>
+                        <button onclick="finishBudget()" class="vintage-btn px-4 py-1.5 text-xs rounded">Ver Impacto Social</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function investProject(buttonElement, name, cost) {
+            if (proyectosElegidos.includes(name)) return;
+            if (presupuesto >= cost) {
+                presupuesto -= cost;
+                proyectosElegidos.push(name);
+                document.getElementById('budget-amount').innerText = `${presupuesto.toLocaleString()} Monedas`;
+                document.getElementById('funded-list').innerText = proyectosElegidos.join(', ');
+                buttonElement.innerText = "¡Financiado!";
+                buttonElement.disabled = true;
+                buttonElement.classList.add("bg-gray-400", "cursor-not-allowed");
+            } else {
+                alert("¡Presupuesto insuficiente para este proyecto!");
+            }
+        }
+
+        function finishBudget() {
+            if (proyectosElegidos.length === 0) {
+                alert("Debes financiar al menos un proyecto para evaluar el impacto.");
+                return;
+            }
+            modalBody.innerHTML = `
+                <div class="space-y-4 text-center py-6">
+                    <h4 class="font-cinzel text-2xl font-bold text-[#3b281a]">¡Evaluación de Impacto Completada!</h4>
+                    <p class="text-sm text-[#4a3525]">Proyectos financiados con éxito: <strong>${proyectosElegidos.join(', ')}</strong>.</p>
+                    <p class="text-xs text-[#6b4f3b]">Has demostrado una excelente gestión de los recursos públicos basada en derechos y prioridades comunitarias.</p>
+                    <button onclick="loadSection4()" class="vintage-btn px-4 py-2 text-xs rounded mt-4">Reiniciar Simulador</button>
+                </div>
+            `;
+        }
+
+        window.onclick = function(event) { if (event.target === modalOverlay) closeModal(); }
+    </script>
+</body>
+</html>
